@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hawke's Nest - Streaming</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #141420;
+            --bg-card: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(20, 20, 32, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3); }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p { color: var(--text-secondary); font-size: 1.25rem; max-width: 600px; margin: 0 auto 2rem; }
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .service-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            background: var(--gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .service-card h3 { margin-bottom: 0.5rem; }
+        .service-card p { color: var(--text-secondary); font-size: 0.9rem; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+        .status-online { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-offline { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-modal.active { display: flex; }
+        .login-box {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .login-box h2 { margin-bottom: 1.5rem; text-align: center; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .form-group input:focus { outline: none; border-color: var(--accent); }
+        .login-box .btn { width: 100%; margin-top: 1rem; }
+        .close-modal {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2">
+                <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1"/>
+                    <stop offset="100%" style="stop-color:#8b5cf6"/>
+                </linearGradient></defs>
+                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                <line x1="12" y1="22" x2="12" y2="15.5"/>
+                <polyline points="22 8.5 12 15.5 2 8.5"/>
+            </svg>
+            Hawke's Nest
+        </div>
+        <div class="nav-links">
+            <a href="#services">Services</a>
+            <a href="#about">About</a>
+            <button class="btn btn-primary" onclick="showLogin()">Sign In</button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Your Personal Streaming Hub</h1>
+        <p>Access your entire media library from anywhere. Movies, TV shows, music, and more - all in one place.</p>
+        <button class="btn btn-primary" onclick="showLogin()">Get Started</button>
+    </section>
+
+    <section id="services" class="services">
+        <a href="https://auburn82.manitoba.usbx.me/jellyfin" class="service-card" target="_blank">
+            <div class="service-icon">🎬</div>
+            <h3>Jellyfin</h3>
+            <p>Stream movies and TV shows with a beautiful, open-source interface</p>
+            <span class="status-badge status-online" id="jellyfin-status">Checking...</span>
+        </a>
+        
+        <a href="https://app.plex.tv" class="service-card" target="_blank">
+            <div class="service-icon">📺</div>
+            <h3>Plex</h3>
+            <p>Premium streaming experience with mobile apps and smart TV support</p>
+            <span class="status-badge status-online">Online</span>
+        </a>
+        
+        <a href="https://jellyseerr-auburn82.manitoba.usbx.me" class="service-card" target="_blank">
+            <div class="service-icon">🎯</div>
+            <h3>Request Media</h3>
+            <p>Request new movies and TV shows to be added to the library</p>
+            <span class="status-badge status-online" id="jellyseerr-status">Checking...</span>
+        </a>
+        
+        <a href="https://auburn82.manitoba.usbx.me/sonarr" class="service-card" target="_blank">
+            <div class="service-icon">📡</div>
+            <h3>TV Management</h3>
+            <p>Manage TV show subscriptions and monitor downloads</p>
+            <span class="status-badge status-online">Online</span>
+        </a>
+        
+        <a href="https://auburn82.manitoba.usbx.me/radarr" class="service-card" target="_blank">
+            <div class="service-icon">🎥</div>
+            <h3>Movie Management</h3>
+            <p>Manage movie library and automate downloads</p>
+            <span class="status-badge status-online">Online</span>
+        </a>
+        
+        <a href="https://auburn82.manitoba.usbx.me/qbittorrent" class="service-card" target="_blank">
+            <div class="service-icon">⬇️</div>
+            <h3>Downloads</h3>
+            <p>Monitor active downloads and manage torrents</p>
+            <span class="status-badge status-online">Online</span>
+        </a>
+    </section>
+
+    <div class="login-modal" id="loginModal">
+        <button class="close-modal" onclick="hideLogin()">&times;</button>
+        <div class="login-box">
+            <h2>Sign In</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                Access requires an invitation
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Hawke's Nest. Personal streaming portal.</p>
+    </footer>
+
+    <script>
+        function showLogin() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+        function hideLogin() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            // Redirect to Jellyfin with credentials
+            window.location.href = 'https://auburn82.manitoba.usbx.me/jellyfin';
+        }
+        
+        // Check service status
+        async function checkStatus() {
+            try {
+                const resp = await fetch('https://auburn82.manitoba.usbx.me/jellyfin/System/Info/Public');
+                if (resp.ok) {
+                    document.getElementById('jellyfin-status').textContent = 'Online';
+                    document.getElementById('jellyfin-status').className = 'status-badge status-online';
+                }
+            } catch (e) {
+                document.getElementById('jellyfin-status').textContent = 'Offline';
+                document.getElementById('jellyfin-status').className = 'status-badge status-offline';
+            }
+            
+            try {
+                const resp2 = await fetch('https://jellyseerr-auburn82.manitoba.usbx.me/api/v1/status');
+                if (resp2.ok) {
+                    document.getElementById('jellyseerr-status').textContent = 'Online';
+                    document.getElementById('jellyseerr-status').className = 'status-badge status-online';
+                }
+            } catch (e) {
+                document.getElementById('jellyseerr-status').textContent = 'Offline';
+                document.getElementById('jellyseerr-status').className = 'status-badge status-offline';
+            }
+        }
+        checkStatus();
+        
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') hideLogin();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+name = "hawkesnest"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./"
+
+[vars]
+JELLYFIN_URL = "https://auburn82.manitoba.usbx.me/jellyfin"
+JELLYSEERR_URL = "https://jellyseerr-auburn82.manitoba.usbx.me"

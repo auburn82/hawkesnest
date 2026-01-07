@@ -1,0 +1,4 @@
+# Redirect to streaming services
+/watch/*  https://auburn82.manitoba.usbx.me/jellyfin/:splat  302
+/request  https://jellyseerr-auburn82.manitoba.usbx.me  302
+/plex     https://app.plex.tv  302
